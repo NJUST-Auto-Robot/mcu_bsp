@@ -2,44 +2,14 @@
  * @Author: Ptisak
  * @Date: 2023-06-17 21:10:18
  * @LastEditors: skybase
- * @LastEditTime: 2024-11-05 20:48:54
+ * @LastEditTime: 2025-03-03 03:36:57
  * @Version: Do not edit
  */
-/******************************************************************************
-/// @brief
-/// @copyright Copyright (c) 2017 <dji-innovations, Corp. RM Dept.>
-/// @license MIT License
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction,including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense,and/or sell
-/// copies of the Software, and to permit persons to whom the Software is furnished
-/// to do so,subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-*******************************************************************************/
-/**
-  ******************************************************************************
-  * @file			pid.c
-  * @version		V1.0.0
-  * @date			2016??11??11??17:21:36
-  * @brief   		����PID?? ����/����ϰ���Խ�get/measure/real/fdb,
-                          ��������һ���set/target/ref
-  *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
 #include "pid.h"
 #include <math.h>
-// #include "cmsis_os.h"
+#include "zf_common_headfile.h"
 
 #define ABS(x) ((x > 0) ? (x) : (-x))
 
@@ -70,7 +40,7 @@ static void pid_param_init(
     pid->d = kd;
 }
 /*------------------------------------------------------------*/
-static void pid_reset(pid_t *pid, float kp, float ki, float kd)
+void pid_reset(pid_t *pid, float kp, float ki, float kd)
 {
     pid->p = kp;
     pid->i = ki;
@@ -92,7 +62,7 @@ float pid_calc(pid_t *pid, float get, float set)
     if (pid->deadband != 0 && ABS(pid->err[NOW]) < pid->deadband)
         return 0;
 
-    if (pid->pid_mode == POSITION_PID) // λ��ʽp
+    if (pid->pid_mode == POSITION_PID) 
     {
         pid->pout = pid->p * pid->err[NOW];
         pid->iout += pid->i * pid->err[NOW];
@@ -102,13 +72,13 @@ float pid_calc(pid_t *pid, float get, float set)
         abs_limit(&(pid->pos_out), pid->MaxOutput);
         pid->last_pos_out = pid->pos_out; // update last time
     }
-    else if (pid->pid_mode == DELTA_PID) // ����ʽP
+    else if (pid->pid_mode == DELTA_PID) 
     {
         pid->pout = pid->p * (pid->err[NOW] - pid->err[LAST]);
         pid->iout = pid->i * pid->err[NOW];
         pid->dout = pid->d * (pid->err[NOW] - 2 * pid->err[LAST] + pid->err[LLAST]);
 
-        // abs_limit(&(pid->iout), pid->IntegralLimit);
+        abs_limit(&(pid->iout), pid->IntegralLimit);
         pid->delta_u = pid->pout + pid->iout + pid->dout;
         abs_limit(&(pid->delta_u), pid->IntegralLimit);
 
@@ -152,17 +122,17 @@ float pid_sp_calc(pid_t *pid, float get, float set, float gyro)
         abs_limit(&(pid->pos_out), pid->MaxOutput);
         pid->last_pos_out = pid->pos_out; // update last time
     }
-    else if (pid->pid_mode == DELTA_PID) // ����ʽP
+    else if (pid->pid_mode == DELTA_PID) 
     {
-        //        pid->pout = pid->p * (pid->err[NOW] - pid->err[LAST]);
-        //        pid->iout = pid->i * pid->err[NOW];
-        //        pid->dout = pid->d * (pid->err[NOW] - 2*pid->err[LAST] + pid->err[LLAST]);
-        //
-        //        abs_limit(&(pid->iout), pid->IntegralLimit);
-        //        pid->delta_u = pid->pout + pid->iout + pid->dout;
-        //        pid->delta_out = pid->last_delta_out + pid->delta_u;
-        //        abs_limit(&(pid->delta_out), pid->MaxOutput);
-        //        pid->last_delta_out = pid->delta_out;	//update last time
+                pid->pout = pid->p * (pid->err[NOW] - pid->err[LAST]);
+                pid->iout = pid->i * pid->err[NOW];
+                pid->dout = pid->d * (pid->err[NOW] - 2*pid->err[LAST] + pid->err[LLAST]);
+
+                abs_limit(&(pid->iout), pid->IntegralLimit);
+                pid->delta_u = pid->pout + pid->iout + pid->dout;
+                pid->delta_out = pid->last_delta_out + pid->delta_u;
+                abs_limit(&(pid->delta_out), pid->MaxOutput);
+                pid->last_delta_out = pid->delta_out;	//update last time
     }
 
     pid->err[LLAST] = pid->err[LAST];
@@ -178,7 +148,7 @@ float pid_sp_calc(pid_t *pid, float get, float set, float gyro)
 }
 
 
-/// @brief pid初始化
+/// @brief 
 /// @param pid 
 /// @param mode 
 /// @param maxout 

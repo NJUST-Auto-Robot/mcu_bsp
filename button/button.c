@@ -2,85 +2,81 @@
  * @Author: skybase
  * @Date: 2025-01-14 09:45:46
  * @LastEditors: skybase
- * @LastEditTime: 2025-01-14 16:28:02
- * @Description:  á••(â— Ú¼â— )á•—â€‹
- * @FilePath: \luntui\BSP\button\button.c
+ * @LastEditTime: 2025-03-03 03:29:59
+ * @Description:  ?(???)??
+ * @FilePath: \luntui_feika\code\button.c
  */
 #include "button.h"
+#include "zf_common_headfile.h"
+#include "xbox.h"
 
 static int idx;
 static ButtonInstance *button_instance[BUTTON_NUM] = {0};
 
 /**
- * @brief ä½¿ç”¨HALåº“å¯¹æŒ‰é”®ä¿¡æ¯è¿›è¡Œæ›´æ–°
+ * @brief Ê¹ÓÃHAL¿â¶Ô°´¼üĞÅÏ¢½øĞĞ¸üĞÂ
  *
- * @note æ ¹æ®ä¸åŒå•ç‰‡æœºç”¨æˆ·è‡ªå·±å®šä¹‰
+ * @note ¸ù¾İ²»Í¬µ¥Æ¬»úÓÃ»§×Ô¼º¶¨Òå
  */
-static void buttons_Check(void)
+static void buttons_Check(int id)
 {
-    for (int i = 0; i < idx; i++)
-    {
-        button_instance[i]->key_state = HAL_GPIO_ReadPin(button_instance[i]->GpioPort, button_instance[i]->GpioPin);
-    }
+
+    button_instance[id]->key_state = !!(xbox_data_frame.buttons & button_instance[id]->xbox_button_enum);
 }
 
-void button_Init(ButtonInstance *_instance,
-                 GPIO_TypeDef *GpioPort,
-                 uint32_t GpioPin,
+void button_Init(char *name,
+                 uint16_t xbox_button_enum,
                  TRIGGER_LEVEL trigger_level,
                  button_module_callback button_down_callback,
                  button_module_callback button_continue_callback,
                  button_module_callback button_up_callback)
 {
-    memset(_instance, 0, sizeof(ButtonInstance));
-    _instance->id = idx++;
-
-    _instance->GpioPort = GpioPort;
-    _instance->GpioPin = GpioPin;
+    ButtonInstance *_instance = malloc(sizeof(ButtonInstance));
+    button_instance[idx++] = _instance;
+    _instance->id = idx;
+    _instance->xbox_button_enum = xbox_button_enum;
+    _instance->name = name;
     _instance->trigger_level = trigger_level;
     _instance->button_down_callback = button_down_callback;
     _instance->button_continue_callback = button_continue_callback;
     _instance->button_up_callback = button_up_callback;
 }
 
-static void button_Callback(void)
+static void button_Callback(int i)
 {
-    for (int i = 0; i < idx; i++)
+    if (button_instance[i]->button_down_callback != NULL && button_instance[i]->press_state == BT_Down)
     {
-        if (button_instance[i]->button_down_callback != NULL && button_instance[i]->press_state == BT_Down)
-        {
-            button_instance[i]->button_down_callback()
-        }
-        else if (button_instance[i]->button_continue_callback != NULL && button_instance[i]->press_state == BT_Pressing)
-        {
-            button_instance[i]->button_continue_callback()
-        }
-        else if (button_instance[i]->button_up_callback != NULL && button_instance[i]->press_state == BT_Up)
-        {
-            button_instance[i]->button_up_callback()
-        }
+        button_instance[i]->button_down_callback(button_instance[i]->name);
+    }
+    else if (button_instance[i]->button_continue_callback != NULL && button_instance[i]->press_state == BT_Pressing)
+    {
+        button_instance[i]->button_continue_callback(button_instance[i]->name);
+    }
+    else if (button_instance[i]->button_up_callback != NULL && button_instance[i]->press_state == BT_Up)
+    {
+        button_instance[i]->button_up_callback(button_instance[i]->name);
     }
 }
 /**
- * @brief buttonsçš„çŠ¶æ€æ›´æ–°å‡½æ•°
+ * @brief buttonsµÄ×´Ì¬¸üĞÂº¯Êı
  *
- * @param time_base çŠ¶æ€æ—¶é—´æ—¶åŸºï¼ˆms)
+ * @param time_base ×´Ì¬Ê±¼äÊ±»ù£¨ms)
  */
 void button_State_Update(int time_base)
 {
     ButtonInstance *_instance;
 
-    button_Callback();
-    buttons_Check();
-    static uint8_t dead_pluse[BUTTON_NUM] = {0};
-    static uint8_t cof[BUTTON_NUM] = {0};
+    static int dead_pluse[BUTTON_NUM] = {0};
+    static int cof[BUTTON_NUM] = {0};
     static int button_pressed_cal[BUTTON_NUM] = {0};
 
     for (int i = 0; i < idx; i++)
     {
+        buttons_Check(i);
+        button_Callback(i);
         _instance = button_instance[i];
 
-        _instance->key_state = _instance->trigger_level == TRIGGER_LEVEL_HIGH ? _instance->key_state : -_instance->key_state;
+        _instance->key_state = _instance->trigger_level == TRIGGER_LEVEL_HIGH ? _instance->key_state : (!_instance->key_state);
 
         _instance->press_state = BT_NONE;
         if (_instance->key_state && button_pressed_cal[i] == 0 && --dead_pluse[i] <= 0)
@@ -89,12 +85,12 @@ void button_State_Update(int time_base)
             {
                 _instance->press_state = BT_Down;
                 button_pressed_cal[i]++;
-                return;
+                continue;
             }
             else
             {
                 cof[i] = 1;
-                return;
+                continue;
             }
         }
         else if (button_pressed_cal[i] > 0)
@@ -109,7 +105,7 @@ void button_State_Update(int time_base)
             button_pressed_cal[i] = 0;
             dead_pluse[i] = 3;
             cof[i] = 0;
-            return;
+            continue;
         }
     }
 }

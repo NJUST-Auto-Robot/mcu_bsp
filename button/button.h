@@ -2,19 +2,20 @@
  * @Author: skybase
  * @Date: 2025-01-14 09:45:50
  * @LastEditors: skybase
- * @LastEditTime: 2025-01-14 16:31:59
- * @Description:  á••(â— Ú¼â— )á•—â€‹
- * @FilePath: \luntui\BSP\button\button.h
+ * @LastEditTime: 2025-03-03 02:09:08
+ * @Description:  ?(???)??
+ * @FilePath: \luntui_feika\code\button.h
  */
 #ifndef BUTTON_H_
 #define BUTTON_H_
 
 #include "stdio.h"
+#include "malloc.h"
+#include "stdint.h"
 #include "string.h"
 
-#include "main.h"
 
-#define BUTTON_NUM 10
+#define BUTTON_NUM 14
 
 typedef enum
 {
@@ -30,40 +31,40 @@ typedef enum
     TRIGGER_LEVEL_LOW,
 } TRIGGER_LEVEL;
 
-typedef void (*button_module_callback)();
+typedef void (*button_module_callback)(void*);
 
 typedef struct
 {
     int id;
+    char* name;
 
     float press_time; //(s)
 
-    uint8_t key_state; // å­˜å‚¨æŒ‰é”®æ£€æµ‹çš„å€¼
+    uint8_t key_state; // ´æ´¢°´¼ü¼ì²âµÄÖµ
 
-    // å½“å‰æŒ‰é”®çŠ¶æ€
+    // µ±Ç°°´¼ü×´Ì¬
     PREES_STATE press_state;
-    // è§¦å‘ç”µå¹³
+    // ´¥·¢µçÆ½
     TRIGGER_LEVEL trigger_level;
 
-    // å¯¹åº”ä¸‰ä¸ªæŒ‰é”®è§¦å‘æ¡ä»¶
+    // ¶ÔÓ¦Èı¸ö°´¼ü´¥·¢Ìõ¼ş
     button_module_callback button_down_callback;
     button_module_callback button_continue_callback;
     button_module_callback button_up_callback;
 
-    // HAlåº“æŒ‰é”®æ¥å£
-    GPIO_TypeDef *GpioPort;
-    uint32_t GpioPin;
+    // // HAl¿â°´¼ü½Ó¿Ú
+    // GPIO_TypeDef *GpioPort;
+    // uint32_t GpioPin;
+    uint16_t xbox_button_enum;
 
 } ButtonInstance;
 
-void button_Init(
-    ButtonInstance _instance,
-    GPIO_TypeDef *GpioPort,
-    uint32_t GpioPin,
-    TRIGGER_LEVEL trigger_level,
-    button_module_callback button_down_callback,
-    button_module_callback button_continue_callback,
-    button_module_callback button_up_callback);
+void button_Init(char *name,
+                 uint16_t xbox_button_enum,
+                 TRIGGER_LEVEL trigger_level,
+                 button_module_callback button_down_callback,
+                 button_module_callback button_continue_callback,
+                 button_module_callback button_up_callback);
 
 void button_State_Update(int time_base);
 

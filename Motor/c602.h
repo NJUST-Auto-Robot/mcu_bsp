@@ -1,17 +1,11 @@
 #ifndef C602_H_
 #define C602_H_
 
-#include "./motor_def.h"
-#include "../Math/pid.h"
+#include "stdint.h"
+#include "motor_def.h"
 
-typedef struct
-{
-    uint8_t id;
-    PID_t pid;
-    Encoder_t encoder;
-    motorControlCallback control_callback;
+extern Motor_Controller_struct motor_3508_instnce[8];
 
-} C602_t;
-
-
+void C602_Set_Current_5_8(void);
+void C602_Set_Current_1_4(void);
 #endif

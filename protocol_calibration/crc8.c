@@ -1,7 +1,21 @@
+/*
+ * @Author: skybase
+ * @Date: 2025-03-30 13:38:54
+ * @LastEditors: skybase
+ * @LastEditTime: 2025-03-30 13:51:08
+ * @Description:  ᕕ(◠ڼ◠)ᕗ​
+ * @FilePath: \mcu_bsp\protocol_calibration\crc8.c
+ */
 #include "crc8.h"
 
 uint8_t _lut[256];
-// ��ȡCRC8У������
+
+/**
+ * @brief CRC8校验初始化
+ *
+ * @param poly CRC8多项式常数
+ * @note 该函数在程序初始化时调用一次即可
+ */
 void Crc8_init(uint8_t poly)
 {
     for (int idx = 0; idx < 256; ++idx)
@@ -15,7 +29,13 @@ void Crc8_init(uint8_t poly)
     }
 }
 
-// CRC8�������õ������CRC
+/**
+ * @brief  CRC8校验计算
+ *
+ * @param data 数据指针
+ * @param len  数据长度
+ * @return uint8_t
+ */
 uint8_t Crc8_calc(uint8_t *data, uint8_t len)
 {
     uint8_t crc = 0;

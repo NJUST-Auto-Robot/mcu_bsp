@@ -2,21 +2,19 @@
  * @Author: skybase
  * @Date: 2025-01-14 09:45:46
  * @LastEditors: skybase
- * @LastEditTime: 2025-03-03 03:29:59
+ * @LastEditTime: 2025-03-30 13:41:12
  * @Description:  ?(???)??
- * @FilePath: \luntui_feika\code\button.c
+ * @FilePath: \mcu_bsp\button\button.c
  */
 #include "button.h"
-#include "zf_common_headfile.h"
-#include "xbox.h"
 
 static int idx;
 static ButtonInstance *button_instance[BUTTON_NUM] = {0};
 
 /**
- * @brief Ê¹ÓÃHAL¿â¶Ô°´¼üĞÅÏ¢½øĞĞ¸üĞÂ
+ * @brief ä½¿ç”¨HALåº“å¯¹æŒ‰é”®ä¿¡æ¯è¿›è¡Œæ›´æ–°
  *
- * @note ¸ù¾İ²»Í¬µ¥Æ¬»úÓÃ»§×Ô¼º¶¨Òå
+ * @note æ ¹æ®ä¸åŒå•ç‰‡æœºç”¨æˆ·è‡ªå·±å®šä¹‰
  */
 static void buttons_Check(int id)
 {
@@ -58,9 +56,9 @@ static void button_Callback(int i)
     }
 }
 /**
- * @brief buttonsµÄ×´Ì¬¸üĞÂº¯Êı
+ * @brief buttonsçš„çŠ¶æ€æ›´æ–°å‡½æ•°
  *
- * @param time_base ×´Ì¬Ê±¼äÊ±»ù£¨ms)
+ * @param time_base çŠ¶æ€æ—¶é—´æ—¶åŸºï¼ˆms)
  */
 void button_State_Update(int time_base)
 {

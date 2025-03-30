@@ -2,9 +2,9 @@
  * @Author: skybase
  * @Date: 2025-01-14 09:45:50
  * @LastEditors: skybase
- * @LastEditTime: 2025-03-03 02:09:08
+ * @LastEditTime: 2025-03-30 13:41:37
  * @Description:  ?(???)??
- * @FilePath: \luntui_feika\code\button.h
+ * @FilePath: \mcu_bsp\button\button.h
  */
 #ifndef BUTTON_H_
 #define BUTTON_H_
@@ -40,19 +40,19 @@ typedef struct
 
     float press_time; //(s)
 
-    uint8_t key_state; // ´æ´¢°´¼ü¼ì²âµÄÖµ
+    uint8_t key_state; // å­˜å‚¨æŒ‰é”®æ£€æµ‹çš„å€¼
 
-    // µ±Ç°°´¼ü×´Ì¬
+    // å½“å‰æŒ‰é”®çŠ¶æ€
     PREES_STATE press_state;
-    // ´¥·¢µçÆ½
+    // è§¦å‘ç”µå¹³
     TRIGGER_LEVEL trigger_level;
 
-    // ¶ÔÓ¦Èı¸ö°´¼ü´¥·¢Ìõ¼ş
+    // å¯¹åº”ä¸‰ä¸ªæŒ‰é”®è§¦å‘æ¡ä»¶
     button_module_callback button_down_callback;
     button_module_callback button_continue_callback;
     button_module_callback button_up_callback;
 
-    // // HAl¿â°´¼ü½Ó¿Ú
+    // // HAlåº“æŒ‰é”®æ¥å£
     // GPIO_TypeDef *GpioPort;
     // uint32_t GpioPin;
     uint16_t xbox_button_enum;

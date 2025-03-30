@@ -2,39 +2,32 @@
  * @Author: skybase
  * @Date: 2024-11-06 23:28:30
  * @LastEditors: skybase
- * @LastEditTime: 2025-01-14 09:20:23
- * @Description:  ᕕ(◠ڼ◠)ᕗ​ 
- * @FilePath: \luntui\BSP\Math\m_math.c
+ * @LastEditTime: 2025-03-30 13:47:29
+ * @Description:  ᕕ(◠ڼ◠)ᕗ​
+ * @FilePath: \mcu_bsp\Math\m_math.c
  */
 #include "m_math.h"
 
+/**
+ * @brief
+ *
+ * @param x   映射前的值起始值
+ * @param y   映射前的值结束值
+ * @param x1  映射后值起始值
+ * @param y1  映射后值结束值
+ * @param value 需要映射的值
+ */
 float remap(float x, float y, float x1, float y1, float value)
 {
     return x1 + (value - x) * (y1 - x1) / (y - x);
 }
 
 /**
- * @brief 对处理前的数据进行阶段分级并分阶段映射到rmap后的数据
- * @param stage 阶段个数
+ * @brief 快速平方根计算函数
+ * 
+ * @param number 
+ * @return float 
  */
-float remap_stage(float x, float y, float x1, float y1, float stage, float value)
-{
-    float inputStageSize = (y - x) / stage;
-    float outputStageSize = (y1 - x1) / stage;
-
-    int currentStage = (int)(1.0 * (value - x) / inputStageSize);
-    if (currentStage < 0)
-        currentStage = 0; // Clamp to stage 0 if below range
-    else if (currentStage >= stage)
-        currentStage = stage - 1; // Clamp to last stage if above range
-
-    float stageInputStart = x + currentStage * inputStageSize;
-    float stageOutputStart = x1 + currentStage * outputStageSize;
-
-    float k = outputStageSize / inputStageSize;
-    return stageOutputStart + k * (value - stageInputStart);
-}
-
 float fast_sqrt(float number)
 {
     long i;

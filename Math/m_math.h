@@ -2,9 +2,9 @@
  * @Author: skybase
  * @Date: 2024-12-18 21:43:51
  * @LastEditors: skybase
- * @LastEditTime: 2025-01-17 04:37:43
+ * @LastEditTime: 2025-03-30 13:46:31
  * @Description:  ᕕ(◠ڼ◠)ᕗ​
- * @FilePath: \BSP\Math\m_math.h
+ * @FilePath: \mcu_bsp\Math\m_math.h
  */
 #ifndef M_MATH_H
 #define M_MATH_H
@@ -14,7 +14,6 @@
 #include "string.h"
 
 float remap(float x, float y, float x1, float y1, float value);
-float remap_stage(float x, float y, float x1, float y1, float stage, float value);
 float fast_sqrt(float number);
 #define LIMIT_MIN_MAX(x, min, max) (x) = (((x) <= (min)) ? (min) : (((x) >= (max)) ? (max) : (x)))
 
